@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Millman.Lib</RootNamespace>
     <AssemblyName>Millman.Lib</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,19 +41,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AggregateProcessor.cs" />
+    <Compile Include="CalculationManager.cs" />
+    <Compile Include="Domain\LineProcessor.cs" />
+    <Compile Include="Domain\Enums.cs" />
+    <Compile Include="Domain\ScenarioLineAggregate.cs" />
     <Compile Include="Errors\LineError.cs" />
-    <Compile Include="Extensions.cs" />
     <Compile Include="Domain\PeriodDefinition.cs" />
     <Compile Include="Domain\PeriodValue.cs" />
-    <Compile Include="TotalTempLine.cs" />
+    <Compile Include="InputStreamReader.cs" />
+    <Compile Include="Interface\IAggregateProcessor.cs" />
+    <Compile Include="Interface\IInputReader.cs" />
+    <Compile Include="Interface\ILineProcessError.cs" />
+    <Compile Include="Interface\ILineProcessInstructions.cs" />
+    <Compile Include="Interface\ILineProcessor.cs" />
+    <Compile Include="Interface\ITempLineProcessor.cs" />
+    <Compile Include="LineProcessInstructions.cs" />
+    <Compile Include="Domain\TotalTempLine.cs" />
     <Compile Include="TotalTempLineProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Millman.Interface\Millman.Interface.csproj">
-      <Project>{9eae295e-96d6-42a7-a0c9-d8738ee7b96b}</Project>
-      <Name>Millman.Interface</Name>
-    </ProjectReference>
+    <Compile Include="Utilitites\Extensions.cs" />
+    <Compile Include="Utilitites\LineSplitter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

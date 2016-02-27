@@ -1,20 +1,19 @@
-﻿using Millman.Interface;
-using Millman.Lib.Domain;
+﻿using Millman.Lib.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Millman.Lib.Interface;
 
-namespace Millman.Lib
+namespace Millman.Lib.Domain
 {
-    public class TotalTempLine : ITotalTempLine
+    public class TotalTempLine 
     {
 
         public TotalTempLine()
         {
             Errors = new List<ILineProcessError>();
-            Values = new List<PeriodValue>();
         }
 
         public List<ILineProcessError> Errors
@@ -37,7 +36,7 @@ namespace Millman.Lib
 
         }
 
-        public OperationType LineOperation
+        public string VariableType
         {
             get;
             set;
@@ -49,16 +48,11 @@ namespace Millman.Lib
             set;
         }
 
-        public List<PeriodValue> Values
-        {
-            get;
-            private set;
-        }
 
-        public ILineProcessResult GetLineResult(ILineProcessor processor)
-        {
-            throw new NotImplementedException();
-        }
+
+        public double ValueOfRelevance { get; set; }
+
+        public bool HasOperation { get; set; }
 
 
     }
