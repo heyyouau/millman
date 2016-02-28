@@ -10,10 +10,17 @@ namespace Millman.Lib.Domain
 {
     public class TotalTempLine 
     {
+        
 
         public TotalTempLine()
         {
             Errors = new List<ILineProcessError>();
+        }
+
+        public TotalTempLine(ILineProcessError lineProcessError):this()
+        {
+            Errors.Add(lineProcessError);
+            InError = true;
         }
 
         public List<ILineProcessError> Errors
@@ -27,13 +34,6 @@ namespace Millman.Lib.Domain
         {
             get;
             set;
-        }
-
-        public int LineId
-        {
-            get;
-            set;
-
         }
 
         public string VariableType
@@ -54,6 +54,8 @@ namespace Millman.Lib.Domain
 
         public bool HasOperation { get; set; }
 
+        public statisticCalculation OperationType { get; set; }
 
+        
     }
 }

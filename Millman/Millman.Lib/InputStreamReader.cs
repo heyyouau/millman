@@ -8,7 +8,10 @@ using Millman.Lib.Interface;
 
 namespace Millman.Lib
 {
-    public class InputStreamReader : IInputReader
+    /// <summary>
+    /// Wraps around a stream reader object to assist in decoupling the input file from the processing
+    /// </summary>
+    public class InputStreamReader : IInputReader, IDisposable
     {
 
         private StreamReader _file; 
@@ -20,9 +23,22 @@ namespace Millman.Lib
             _file = new System.IO.StreamReader(path);
         }
 
+        public void Dispose()
+        {
+            _file.Dispose();
+            GC.SuppressFinalize(this);
+        }
 
+        /// <summary>
+        /// Reads the next line of text from the input file.
+        /// </summary>
+        /// <returns>A line of text, or null if EOF</returns>
         public string ReadNext()
         {
+
+            if (_file.EndOfStream)
+                return null;
+
             var t = _file.ReadLine();
             if (t == null)
                 _file.Close();

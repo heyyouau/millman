@@ -6,7 +6,7 @@ namespace Millman.Lib.Interface
     public interface ILineProcessInstructions
     {
         void AddProcessCommand(string processLine);
-        double ExtractPeriodValueOfInterest(List<PeriodValue> values, string variableType);
+        List<RelevantValue> ExtractPeriodValueOfInterest(List<PeriodValue> values, string variableType);
         Dictionary<string, ILineProcessor> Processors { get; }
     }
 }

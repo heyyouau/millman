@@ -9,7 +9,7 @@ namespace Millman.Lib.Interface
 {
     public interface ITempLineProcessor
     {
-        TotalTempLine ParseLine(int lineId, string line, ILineProcessInstructions instructions);
+        IEnumerable<TotalTempLine> ParseLine(string line, ILineProcessInstructions instructions);
         void SetHeader(string line);
     }
 }

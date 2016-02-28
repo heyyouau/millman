@@ -10,8 +10,9 @@ using Millman.Lib.Interface;
 namespace Millman.Lib
 {
 
-    
-
+    /// <summary>
+    /// Iterates over the incoming temp file and adds the parsed results to the result collection for aggrergate processing
+    /// </summary>
     public class CalculationManager
     {
         private readonly ITempLineProcessor _lineProcessor;
@@ -40,7 +41,7 @@ namespace Millman.Lib
                 if (lineNumber == 0)
                     _lineProcessor.SetHeader(tLine);
                 else
-                    tempLineResults.AddResult(_lineProcessor.ParseLine(lineNumber, tLine, instructions));
+                    tempLineResults.AddResults(_lineProcessor.ParseLine(tLine, instructions));
 
                 lineNumber++;
                 tLine = tempFileReader.ReadNext();

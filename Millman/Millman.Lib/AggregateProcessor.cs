@@ -8,15 +8,28 @@ using Millman.Lib.Interface;
 
 namespace Millman.Lib
 {
+    /// <summary>
+    /// Collects the parsed line results and calcualtes the output result set.
+    /// </summary>
     public class AggregateProcessor : IAggregateProcessor
     {
         private List<TotalTempLine> _lineResults = new List<TotalTempLine>();
 
-        public void AddResult(TotalTempLine line)
+        /// <summary>
+        /// Adds a parsed result line from the input value file to the collection to be processed by GenerateAggregateResultSet
+        /// </summary>
+        /// <param name="line">The processed line</param>
+        public void AddResults(IEnumerable<TotalTempLine> lines)
         {
-            _lineResults.Add(line);
+            _lineResults.AddRange(lines);
         }
 
+
+        /// <summary>
+        /// Uses the collection of process instructions and the collected line results to create the set of calculated results
+        /// </summary>
+        /// <param name="instructions">The set of instructions generated from the config file</param>
+        /// <returns></returns>
         public List<ScenarioLineAggregate> GenerateAggregateResultSet(ILineProcessInstructions instructions)
         {
             //get the distinct list of calclation types
@@ -25,29 +38,30 @@ namespace Millman.Lib
 
             foreach (var t in types)
             {
-                var calcValues = _lineResults.Where(e => e.HasOperation && e.VariableType == t);
-                //calculate the stats for each operation on this data type
-                foreach (var inst in instructions.Processors.Where(e => e.Key == t))
+                foreach (var op in _lineResults.Where(o => o.VariableType == t).Select(x => x.OperationType).Distinct())
                 {
-                    var value = 0d;
-                    switch (inst.Value.OperationType)
-                    {
-                        case statisticCalculation.Average:
-                            value = CalculateAverage(calcValues);
-                            break;
-                        case statisticCalculation.MinValue:
-                            value = CalculateMinValue(calcValues);
-                            break;
-                        case statisticCalculation.MaxValue:
-                            value = CalculateMaxValue(calcValues);
-                            break;
-                    }
-                    results.Add(new ScenarioLineAggregate()
-                            {
-                                VariableType = t,
-                                Value = value,
-                                CalculationType = inst.Value.OperationType.ToString()
-                            });
+                    var calcValues = _lineResults.Where(e => e.HasOperation && e.VariableType == t && e.OperationType == op);
+                    //calculate the stats for each operation on this data type
+                    
+                        var value = 0d;
+                        switch (op)
+                        {
+                            case statisticCalculation.Average:
+                                value = CalculateAverage(calcValues);
+                                break;
+                            case statisticCalculation.MinValue:
+                                value = CalculateMinValue(calcValues);
+                                break;
+                            case statisticCalculation.MaxValue:
+                                value = CalculateMaxValue(calcValues);
+                                break;
+                        }
+                        results.Add(new ScenarioLineAggregate()
+                        {
+                            VariableType = t,
+                            Value = value,
+                            CalculationType = op.ToString()
+                        });
                 }
             }
 

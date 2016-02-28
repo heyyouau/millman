@@ -24,7 +24,7 @@ namespace Millman.Tests
 
             //assert
             Assert.AreEqual(1, sut.Processors.Count);
-            Assert.AreEqual(periodChoice.MaxPeriodValue, sut.Processors["CashPrem"].Period);
+            Assert.AreEqual(periodChoice.MaxPeriodValue, sut.Processors["CashPrem_MaxPeriodValue_Average"].Period);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace Millman.Tests
 
             //assert
             Assert.AreEqual(1, sut.Processors.Count);
-            Assert.AreEqual(periodChoice.LastValue, sut.Processors["CashPrem"].Period);
+            Assert.AreEqual(periodChoice.LastValue, sut.Processors["CashPrem_LastValue_Average"].Period);
         }
 
         [TestMethod]
@@ -54,7 +54,7 @@ namespace Millman.Tests
 
             //assert
             Assert.AreEqual(1, sut.Processors.Count);
-            Assert.AreEqual(periodChoice.FirstValue, sut.Processors["CashPrem"].Period);
+            Assert.AreEqual(periodChoice.FirstValue, sut.Processors["CashPrem_FirstValue_Average"].Period);
         }
 
         [TestMethod]
@@ -69,7 +69,7 @@ namespace Millman.Tests
 
             //assert
             Assert.AreEqual(1, sut.Processors.Count);
-            Assert.AreEqual(periodChoice.MinPeriodValue, sut.Processors["CashPrem"].Period);
+            Assert.AreEqual(periodChoice.MinPeriodValue, sut.Processors["CashPrem_MinPeriodValue_Average"].Period);
         }
 
 
@@ -85,12 +85,12 @@ namespace Millman.Tests
             var val = sut.ExtractPeriodValueOfInterest(GetTestValues(), "CashPrem");
 
             //assert
-            Assert.AreEqual(100, val);
+            Assert.AreEqual(100, val.First().Value);
         }
 
 
         [TestMethod]
-        public void LarstValueIsReturnedAsRelevantValue()
+        public void LastValueIsReturnedAsRelevantValue()
         {
             //setup
             var line = string.Format("{0}\t{1}\t{2}", "CashPrem", "Average", "LastValue");
@@ -101,7 +101,7 @@ namespace Millman.Tests
             var val = sut.ExtractPeriodValueOfInterest(GetTestValues(), "CashPrem");
 
             //assert
-            Assert.AreEqual(200, val);
+            Assert.AreEqual(200, val.First().Value);
         }
 
 
@@ -117,7 +117,7 @@ namespace Millman.Tests
             var val = sut.ExtractPeriodValueOfInterest(GetTestValues(), "CashPrem");
 
             //assert
-            Assert.AreEqual(400, val);
+            Assert.AreEqual(400, val.First().Value);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace Millman.Tests
             var val = sut.ExtractPeriodValueOfInterest(GetTestValues(), "CashPrem");
 
             //assert
-            Assert.AreEqual(50, val);
+            Assert.AreEqual(50, val.First().Value);
         }
 
         [TestMethod, ExpectedException(typeof(Exception))]
@@ -147,6 +147,25 @@ namespace Millman.Tests
             var val = sut.ExtractPeriodValueOfInterest(GetTestValues(), "x");
 
             
+        }
+
+        [TestMethod]
+        public void MultipleCalculationsOnSameVariableCorrectlyLoad()
+        {
+            //setup
+            var line1 = string.Format("{0}\t{1}\t{2}", "CashPrem", "Average", "MinValue");
+            var line2 = string.Format("{0}\t{1}\t{2}", "CashPrem", "MaxValue", "MinValue");
+            var sut = new LineProcessInstructions();
+            
+
+            //execute
+            sut.AddProcessCommand(line1);
+            sut.AddProcessCommand(line2);
+
+            //assert
+            Assert.AreEqual(2, sut.Processors.Count);
+            Assert.IsTrue(sut.Processors.ContainsKey("CashPrem_MinPeriodValue_MaxValue"));
+            Assert.IsTrue(sut.Processors.ContainsKey("CashPrem_MinPeriodValue_Average"));
         }
 
         private List<PeriodValue> GetTestValues()

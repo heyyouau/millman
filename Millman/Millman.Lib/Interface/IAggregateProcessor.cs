@@ -5,7 +5,7 @@ namespace Millman.Lib.Interface
 {
     public interface IAggregateProcessor
     {
-        void AddResult(TotalTempLine line);
+        void AddResults(IEnumerable<TotalTempLine> lines);
         List<ScenarioLineAggregate> GenerateAggregateResultSet(ILineProcessInstructions instructions);
     }
 }

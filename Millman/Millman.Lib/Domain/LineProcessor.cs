@@ -19,6 +19,17 @@ namespace Millman.Lib.Domain
         public periodChoice Period { get; set; }
         public statisticCalculation OperationType { get; set; }
 
+        /// <summary>
+        /// VariableType_Period_OperationType
+        /// </summary>
+        public string Key
+        {
+            get
+            {
+                return string.Format("{0}_{1}_{2}", VariableType, Period, OperationType);
+            }
+        }
+
         
     }
 }

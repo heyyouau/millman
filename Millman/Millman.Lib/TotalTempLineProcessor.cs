@@ -10,6 +10,9 @@ using Millman.Lib.Utilitites;
 
 namespace Millman.Lib
 {
+    /// <summary>
+    /// Parses through incoming lines of text and converts them into TotalTempLineObjects
+    /// </summary>
     public class TotalTempLineProcessor : ITempLineProcessor
     {
         private List<PeriodDefinition> _periods = new List<PeriodDefinition>();
@@ -39,36 +42,30 @@ namespace Millman.Lib
             }
         }
 
-        public TotalTempLine ParseLine(int lineId, string line, ILineProcessInstructions instructions)
+        public IEnumerable<TotalTempLine> ParseLine(string line, ILineProcessInstructions instructions)
         {
-            var result = new TotalTempLine() {
-                LineId = lineId
-            };
-
+            var result = new List<TotalTempLine>();
+                
             var parts = LineSplitter.Split(line);
 
             if (parts.Length < 3) {
-                result.InError = true;
-                result.Errors.Add(LineError.InvalidLineFormat(line));
+                result.Add(new TotalTempLine(LineError.InvalidLineFormat(line)));
                 return result;
             }
 
             //first part - get the scenarie
             int sceneid;
-
-            if (int.TryParse(parts[0], out sceneid))
-                result.ScenarioId = sceneid;
-            else {
-                result.Errors.Add(LineError.InvalidSceneIdError(parts[0]));
+            if (!int.TryParse(parts[0], out sceneid)) { 
+                result.Add(new TotalTempLine(LineError.InvalidSceneIdError(parts[0])));
                 return result;
             }
-            
+
 
             //get the variable type for this line
-            result.VariableType = parts[1];
+            var variableType = parts[1];
 
             //only execute parsing and calculations if there is an instruction for this variable type
-            if (instructions.Processors.ContainsKey(result.VariableType))
+            if (instructions.Processors.Values.Any(e => e.VariableType == variableType))
             {
                 var periodValues = new List<PeriodValue>();
 
@@ -86,8 +83,16 @@ namespace Millman.Lib
                         });
                     }
                 }
-                result.HasOperation = true;
-                result.ValueOfRelevance = instructions.ExtractPeriodValueOfInterest(periodValues, result.VariableType);
+
+                instructions.ExtractPeriodValueOfInterest(periodValues, variableType).ForEach(r => result.Add(new TotalTempLine()
+                {
+                    HasOperation = true,
+                    ScenarioId = sceneid,
+                    ValueOfRelevance = r.Value,
+                    VariableType = variableType,
+                    OperationType = r.Operation
+                }));
+                
             }
 
             return result;

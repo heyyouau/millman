@@ -9,16 +9,26 @@ using Millman.Lib.Utilitites;
 
 namespace Millman.Lib
 {
+    /// <summary>
+    /// The collection of configuration instructions
+    /// </summary>
     public class LineProcessInstructions : ILineProcessInstructions
     {
         private List<ScenarioLineAggregate> _aggregates = new List<ScenarioLineAggregate>();
         private Dictionary<string, ILineProcessor> _processors = new Dictionary<string, ILineProcessor>();
 
+        /// <summary>
+        /// Returns a dictionary of Line process instructions
+        /// </summary>
         public Dictionary<string, ILineProcessor> Processors
         {
             get { return _processors; }
         }
 
+        /// <summary>
+        /// Parses a line of tab delimited text into a process instruction
+        /// </summary>
+        /// <param name="processLine">A tab delimited line of text that confirms to the required format</param>
         public void AddProcessCommand(string processLine)
         {
             var parts = LineSplitter.Split(processLine);
@@ -41,37 +51,45 @@ namespace Millman.Lib
             else
                 throw new Exception(string.Format("Unrecognised period choice = {0}", parts[2]));
 
-            _processors.Add(processor.VariableType, processor);
+            _processors.Add(processor.Key, processor);
 
         }
-
-        public double ExtractPeriodValueOfInterest(List<PeriodValue> values, string variableType)
+        
+        /// <summary>
+        /// Locates a value of relevance based on the variable type 
+        /// </summary>
+        /// <param name="values">The set of values for the current scenario and variable type</param>
+        /// <param name="variableType">The name of the variabke type</param>
+        /// <returns></returns>
+        public List<RelevantValue> ExtractPeriodValueOfInterest(List<PeriodValue> values, string variableType)
         {
-            double result = 0f;
-            if (_processors.ContainsKey(variableType))
+            var results = new List<RelevantValue>();
+            if (_processors.Values.Any(t => t.VariableType == variableType))
             {
-                var instruction = _processors[variableType];
-
-                switch (instruction.Period)
+                foreach (var instruction in _processors.Values.Where(e => e.VariableType == variableType))
                 {
-                    case periodChoice.FirstValue:
-                        result = values.First().Value;
-                        break;
-                    case periodChoice.LastValue:
-                        result = values.Last().Value;
-                        break;
-                    case periodChoice.MinPeriodValue:
-                        result = values.Min(t => t.Value);
-                        break;
-                    case periodChoice.MaxPeriodValue:
-                        result = values.Max(t => t.Value);
-                        break;
+
+                    switch (instruction.Period)
+                    {
+                        case periodChoice.FirstValue:
+                            results.Add(new RelevantValue(instruction, values.First().Value));
+                            break;
+                        case periodChoice.LastValue:
+                            results.Add(new RelevantValue(instruction, values.Last().Value));
+                            break;
+                        case periodChoice.MinPeriodValue:
+                            results.Add(new RelevantValue(instruction, values.Min(t => t.Value)));
+                            break;
+                        case periodChoice.MaxPeriodValue:
+                            results.Add(new RelevantValue(instruction, values.Max(t => t.Value)));
+                            break;
+                    }
                 }
             }
             else 
                 throw new Exception("No instruction for supplied variable type");
 
-            return result;
+            return results;
 
         }
     }

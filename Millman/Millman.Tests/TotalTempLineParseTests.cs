@@ -36,17 +36,17 @@ namespace Millman.Tests
             var objectUnderTest = new TotalTempLineProcessor();
             objectUnderTest.SetHeader(GetValidHeader());
             //execute
-            var line = objectUnderTest.ParseLine(1, GetBadLine(), null);
+            var lines = objectUnderTest.ParseLine(GetBadLine(), null);
 
             //assert
-            Assert.AreEqual(true, line.InError);
-            Assert.AreEqual(1, line.Errors.Count);
-            Assert.AreEqual(2, line.Errors.First().ErrorCode);
+            Assert.AreEqual(true, lines.Any(e => e.InError));
+            Assert.AreEqual(1, lines.First().Errors.Count);
+            Assert.AreEqual(2, lines.First().Errors.First().ErrorCode);
             
         }
 
         [TestMethod]
-        public void GetLineWithoutInstructionReturnsHasOperationEqualsFalse()
+        public void GetLineWithoutInstructionReturnsEmptyCollection()
         {
             //setup
             var objectUnderTest = new TotalTempLineProcessor();
@@ -55,11 +55,10 @@ namespace Millman.Tests
             moqInstructions.Setup(x => x.Processors).Returns(new Dictionary<string, ILineProcessor>());
 
             //execute
-            var line = objectUnderTest.ParseLine(1, GetCashPrem(), moqInstructions.Object);
+            var lines = objectUnderTest.ParseLine(GetCashPrem(), moqInstructions.Object);
 
             //assert
-            Assert.IsFalse(line.HasOperation);
-            Assert.AreEqual(0, line.ValueOfRelevance);
+            Assert.AreEqual(0, lines.Count());
         }
 
 
@@ -71,23 +70,25 @@ namespace Millman.Tests
             var objectUnderTest = new TotalTempLineProcessor();
             objectUnderTest.SetHeader(GetValidHeader());
             var moqInstructions = new Mock<ILineProcessInstructions>();
+            var testInstruction = new LineProcessor()
+            {
+                Period = periodChoice.LastValue,
+                OperationType = statisticCalculation.Average,
+                VariableType = "CashPrem"
+            };
             moqInstructions.Setup(x => x.Processors).Returns(new Dictionary<string, ILineProcessor>()
             {
-                {"CashPrem", new LineProcessor()
-                {
-                    Period = periodChoice.LastValue,
-                    OperationType = statisticCalculation.Average
-                }}    
+                {testInstruction.Key, testInstruction}    
             });
             moqInstructions.Setup(t => t.ExtractPeriodValueOfInterest(It.IsAny<List<PeriodValue>>(), It.IsAny<string>()))
-                .Returns(_testValues[4]);
+                .Returns(new List<RelevantValue>() { new RelevantValue() { Value = _testValues[4] } });
 
             //execute
-            var line = objectUnderTest.ParseLine(1, GetCashPrem(), GetInstructions("CashPrem", "average", "LastValue"));
+            var lines = objectUnderTest.ParseLine(GetCashPrem(), moqInstructions.Object);
 
             //assert
-            Assert.IsTrue(line.HasOperation);
-            Assert.AreEqual(_testValues[4], line.ValueOfRelevance);
+            Assert.IsTrue(lines.First().HasOperation);
+            Assert.AreEqual(_testValues[4], lines.First().ValueOfRelevance);
         }
 
 

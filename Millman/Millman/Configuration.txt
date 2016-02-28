@@ -1,1 +1,2 @@
 ﻿CashPrem	Average	MaxValue
+CashPrem	MaxValue	LastValue

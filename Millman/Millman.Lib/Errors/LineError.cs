@@ -7,6 +7,9 @@ using Millman.Lib.Interface;
 
 namespace Millman.Lib.Errors
 {
+    /// <summary>
+    /// An error caused by a failure of the system to be able to parse the incomming text.
+    /// </summary>
     public class LineError : ILineProcessError
     {
         public static ILineProcessError InvalidSceneIdError(string invalidValue)
@@ -14,7 +17,7 @@ namespace Millman.Lib.Errors
             return new LineError()
             {
                 ErrorCode = 1,
-                Message = string.Format("{0} cannot be parsed into a valid SceneId")
+                Message = string.Format("{0} cannot be parsed into a valid SceneId", invalidValue)
             };
         }
 

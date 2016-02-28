@@ -45,6 +45,7 @@
     <Compile Include="CalculationManager.cs" />
     <Compile Include="Domain\LineProcessor.cs" />
     <Compile Include="Domain\Enums.cs" />
+    <Compile Include="Domain\RelevantValue.cs" />
     <Compile Include="Domain\ScenarioLineAggregate.cs" />
     <Compile Include="Errors\LineError.cs" />
     <Compile Include="Domain\PeriodDefinition.cs" />
