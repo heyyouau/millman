@@ -23,30 +23,43 @@ namespace Millman.Lib
         }
         public List<ScenarioLineAggregate> RunProcess(IInputReader tempFileReader, IInputReader configFileReader)
         {
-            var instructions = new LineProcessInstructions();
-            var tempLineResults = new AggregateProcessor();
-
-            var line = configFileReader.ReadNext();
-            while (line != null)
+            try
             {
-                instructions.AddProcessCommand(line);
-                line = configFileReader.ReadNext();
-            }
-            
-            
-            var lineNumber = 0;
-            var tLine = tempFileReader.ReadNext();
-            while (tLine != null)
-            {
-                if (lineNumber == 0)
-                    _lineProcessor.SetHeader(tLine);
-                else
-                    tempLineResults.AddResults(_lineProcessor.ParseLine(tLine, instructions));
+                var instructions = new LineProcessInstructions();
+                var tempLineResults = new AggregateProcessor();
 
-                lineNumber++;
-                tLine = tempFileReader.ReadNext();
+                var line = configFileReader.ReadNext();
+                while (line != null)
+                {
+                    instructions.AddProcessCommand(line);
+                    line = configFileReader.ReadNext();
+                }
+
+
+                var lineNumber = 0;
+                var tLine = tempFileReader.ReadNext();
+                while (tLine != null)
+                {
+                    if (lineNumber == 0)
+                        _lineProcessor.SetHeader(tLine);
+                    else
+                    {
+                        var results = _lineProcessor.ParseLine(tLine, instructions);
+                        if (results.Any(e => e.InError))
+                            throw new Exception(string.Join(",", results.SelectMany(e => e.Errors.Select(m => string.Format("Error Code: {0}\tMessage: {1}\n", m.ErrorCode, m.Message)))));
+                        
+                        tempLineResults.AddResults(results);
+                    }
+
+                    lineNumber++;
+                    tLine = tempFileReader.ReadNext();
+                }
+                return tempLineResults.GenerateAggregateResultSet();
             }
-            return tempLineResults.GenerateAggregateResultSet(instructions);
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

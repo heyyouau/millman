@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Millman.Lib;
@@ -10,7 +11,7 @@ using Moq;
 
 namespace Millman.Tests
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class TotalTempLineParseTests
     {
         private List<double> _testValues = new List<double>() { 165215335.38, 130922548.81, 107196660.00, 92462698.42, 84655947.13 };
@@ -91,6 +92,40 @@ namespace Millman.Tests
             Assert.AreEqual(_testValues[4], lines.First().ValueOfRelevance);
         }
 
+        [TestMethod]
+        public void InvalidSceneIdCausesError()
+        {
+            var objectUnderTest = new TotalTempLineProcessor();
+            objectUnderTest.SetHeader(GetValidHeader());
+            var moqInstructions = new Mock<ILineProcessInstructions>();
+            var testInstruction = new LineProcessor()
+            {
+                Period = periodChoice.LastValue,
+                OperationType = statisticCalculation.Average,
+                VariableType = "CashPrem"
+            };
+
+            //execute
+            var lines = objectUnderTest.ParseLine(GetCashPrem(true), moqInstructions.Object);
+
+            //assert
+            Assert.IsTrue(lines.First().InError);
+            Assert.AreEqual(1, lines.First().Errors.First().ErrorCode);
+        
+        }
+
+        [TestMethod, ExpectedException(typeof(Exception))]
+        public void HeaderWithout3PartsThrowsException()
+        {
+            //setup
+            var objectUnderTest = new TotalTempLineProcessor();
+            
+            //execute
+            objectUnderTest.SetHeader("x");
+
+
+        }
+
 
         private LineProcessInstructions GetInstructions(string variableType, string stats, string period)
         {
@@ -105,9 +140,9 @@ namespace Millman.Tests
             return string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t", "ScenId", "VarName", "Value000", "Value001", "Value002", "Value003", "Value004");
         }
 
-        private string GetCashPrem()
+        private string GetCashPrem(bool invalidSceneId = false)
         {
-            return string.Format("{0}\t{1}\t{2}", 1, "CashPrem", string.Join("\t", _testValues));
+            return string.Format("{0}\t{1}\t{2}", invalidSceneId ? "1x" : 1.ToString(), "CashPrem", string.Join("\t", _testValues));
         }
 
         private string GetBadLine()

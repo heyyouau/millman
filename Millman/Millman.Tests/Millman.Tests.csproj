@@ -56,7 +56,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AggregateProcessorTests.cs" />
+    <Compile Include="CalculationManagerTests.cs" />
     <Compile Include="ConfigurationFileTests.cs" />
+    <Compile Include="IInputStreamReader.cs" />
+    <Compile Include="InputReaderTests.cs" />
     <Compile Include="TotalTempLineParseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

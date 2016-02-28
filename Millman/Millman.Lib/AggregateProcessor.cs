@@ -30,7 +30,7 @@ namespace Millman.Lib
         /// </summary>
         /// <param name="instructions">The set of instructions generated from the config file</param>
         /// <returns></returns>
-        public List<ScenarioLineAggregate> GenerateAggregateResultSet(ILineProcessInstructions instructions)
+        public List<ScenarioLineAggregate> GenerateAggregateResultSet()
         {
             //get the distinct list of calclation types
             var types = _lineResults.Where(e => e.HasOperation).Select(t => t.VariableType).Distinct();

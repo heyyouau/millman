@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace Millman.Lib
                     });
             }
             else
-                throw new ApplicationException("Invalid Header format");
+                throw new Exception("Invalid Header format");
         }
 
         public List<PeriodDefinition> PeriodDefinitions
@@ -81,6 +82,10 @@ namespace Millman.Lib
                             PeriodId = _periods[i - 2].Name,
                             Value = pv
                         });
+                    }
+                    else
+                    {
+                        result.Add(new TotalTempLine(LineError.InvalidValueError(parts[i])));
                     }
                 }
 

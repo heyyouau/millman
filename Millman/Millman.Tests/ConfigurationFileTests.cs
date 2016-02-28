@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using Millman.Lib.Domain;
 
 namespace Millman.Tests
 {
-    [TestClass]
+    [TestClass, ExcludeFromCodeCoverage]
     public class ConfigurationFileTests
     {
         [TestMethod]
@@ -167,6 +168,31 @@ namespace Millman.Tests
             Assert.IsTrue(sut.Processors.ContainsKey("CashPrem_MinPeriodValue_MaxValue"));
             Assert.IsTrue(sut.Processors.ContainsKey("CashPrem_MinPeriodValue_Average"));
         }
+
+        [TestMethod, ExpectedException(typeof (Exception))]
+        public void InvalidLineFormatThrowsException()
+        {
+            //setup
+            var line1 = string.Format("{0}\t{1}", "CashPrem", "Average");
+            var sut = new LineProcessInstructions();
+
+            //execute
+            sut.AddProcessCommand(line1);
+        }
+
+        [TestMethod, ExpectedException(typeof(Exception))]
+        public void InvalidPeriodFormatThrowsException()
+        {
+            //setup
+            var line1 = string.Format("{0}\t{1}\t{2}", "CashPrem", "Average", "somethingweird");
+            var sut = new LineProcessInstructions();
+
+            //execute
+            sut.AddProcessCommand(line1);
+        }
+
+
+       
 
         private List<PeriodValue> GetTestValues()
         {

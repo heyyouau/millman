@@ -30,12 +30,13 @@ namespace Millman.Lib.Errors
             };
         }
 
-        internal static ILineProcessError UnknownOperationType(string invalidOperation)
+
+        internal static ILineProcessError InvalidValueError(string invalidNumber)
         {
             return new LineError()
             {
-                ErrorCode = 3,
-                Message = string.Format("\"{0}\" is an unknown format", invalidOperation)
+                ErrorCode = 4,
+                Message = string.Format("\"{0}\" is an invalid value", invalidNumber)
             };
         }
 
@@ -57,6 +58,8 @@ namespace Millman.Lib.Errors
             private set;
         }
 
-        
+
+
+      
     }
 }
